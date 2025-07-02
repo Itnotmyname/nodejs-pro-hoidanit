@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "es6",
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "outDir": "dist", //"build"
+    "rootDir": "src", //Phục vụ quá trình built ts sang js (quyết định file nào build và cấu trúc như thế nào)
+    "baseUrl": ".", //Phục vụ việc định nghĩa đường dẫn của file xuất phát từ đâu (Ta để dấu . cho vùng rộng ra)
+    "paths": {
+      "config/*": [
+        "./src/config/*"
+      ],
+      "controllers/*": [
+        "./src/controllers/*"
+      ],
+      "models/*": [
+        "./src/models/*"
+      ],
+      "routes/*": [
+        "./src/routes/*"
+      ],
+      "services/*": [
+        "./src/services/*"
+      ],
+    },
+  }
+}
