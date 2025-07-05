@@ -10,9 +10,11 @@ const handleCreateUser = async (
 
     const newUser = await prisma.user.create({
         data: {
-            name: fullName,
-            email: email,
-            address: address
+            fullName: fullName,
+            username: email,
+            address: address,
+            password: "",
+            accountType: "",
         }
     })
     return newUser;
@@ -22,6 +24,13 @@ const getAllUsers = async () => {
     return users;
 
 }
+
+const getAllRoles = async () => {
+    const roles = await prisma.role.findMany();
+    return roles;
+
+}
+
 const handleDeleteUser = async (id: string) => {
     const result = await prisma.user.delete({
         where: { id: +id }
@@ -37,13 +46,15 @@ const updateUserById = async (id: string, email: string, address: string, fullNa
     const updatedUser = await prisma.user.update({
         where: { id: +id }, //Mẹo dùng +id để convert id từ string sang number(int) chỉ áp dụng cho javascript
         data: {
-            name: fullName,
-            email: email,
-            address: address
+            fullName: fullName,
+            username: email,
+            address: address,
+            password: "",
+            accountType: "",
         }
     })
     return updatedUser;
 }
 
-export { handleCreateUser, getAllUsers, handleDeleteUser, getUserById, updateUserById }
+export { handleCreateUser, getAllUsers, handleDeleteUser, getUserById, updateUserById, getAllRoles };
 

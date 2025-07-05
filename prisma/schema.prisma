@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model post {
+  id Int @id
+}
+
+model User {
+  id          Int     @id @default(autoincrement())
+  username    String  @db.VarChar(255)
+  password    String  @db.VarChar(255)
+  fullName    String? @db.VarChar(255)
+  address     String? @db.VarChar(255)
+  phone       String? @db.VarChar(255)
+  accountType String  @db.VarChar(50)
+  avatar      String? @db.VarChar(255)
+
+  @@map("users") //Xem video 72 NodeJS để hiểu rõ hơn
+}
+
+model Role {
+  id          Int    @id @default(autoincrement())
+  name        String @db.VarChar(100)
+  description String @db.VarChar(255)
+
+  @@map("roles") //Xem video 72 NodeJS để hiểu rõ hơn
+}
+
+model Order {
+  id         Int @id @default(autoincrement())
+  totalPrice Int
+
+  @@map("orders") //Xem video 72 NodeJS để hiểu rõ hơn
+}
+
+model Product {
+  id         Int    @id @default(autoincrement())
+  name       String @db.VarChar(255)
+  price      Int
+  image      String @db.VarChar(255)
+  detailDesc String @db.VarChar(255)
+  shortDesc  String @db.VarChar(255)
+  quantity   Int
+  sold       String @db.VarChar(255)
+  factory    String @db.VarChar(255)
+  target     String @db.VarChar(255)
+
+  @@map("products") //Xem video 72 NodeJS để hiểu rõ hơn
+}
