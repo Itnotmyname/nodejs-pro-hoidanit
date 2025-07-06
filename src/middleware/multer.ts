@@ -18,7 +18,7 @@ const fileUploadMiddleware = (fieldName: string, dir: string = 'images') => {
         fileFilter: (req: Express.Request, file: Express.Multer.File, callback: Function) => {
             if (
                 file.mimetype === 'image/png' ||  //định dạng ảnh được cho phép
-                file.mimetype === 'image/jpg' ||  
+                file.mimetype === 'image/jpg' ||
                 file.mimetype === 'image/jpeg'
             ) {
                 callback(null, true);

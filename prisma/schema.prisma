@@ -21,6 +21,9 @@ model User {
   accountType String  @db.VarChar(50)
   avatar      String? @db.VarChar(255)
 
+  role   Role @relation(fields: [roleId], references: [id])
+  roleId Int //xem video 86 NodeJS để hiểu rõ hơn
+
   @@map("users") //Xem video 72 NodeJS để hiểu rõ hơn
 }
 
@@ -28,6 +31,7 @@ model Role {
   id          Int    @id @default(autoincrement())
   name        String @db.VarChar(100)
   description String @db.VarChar(255)
+  users       User[]//xem video 86 NodeJS để hiểu rõ hơn
 
   @@map("roles") //Xem video 72 NodeJS để hiểu rõ hơn
 }
