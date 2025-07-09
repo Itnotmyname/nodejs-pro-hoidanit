@@ -4,7 +4,7 @@ import { get } from 'http';
 import { getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage } from 'controllers/admin/dashboard.controllers';
 import fileUploadMiddleware from 'src/middleware/multer';
 import { getProductPage } from 'controllers/client/product.controller';
-import { getAdminCreateProductPage, postAdminProductPage } from 'controllers/admin/product.controller';
+import { getAdminCreateProductPage, getViewProduct, postAdminProductPage, postdeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
 
 const router = express.Router();
 
@@ -27,6 +27,11 @@ const webRoutes = (app: Express) => {
     router.get("/admin/product", getAdminProductPage);
     router.get("/admin/create-product", getAdminCreateProductPage);//Lấy data thì dùng get
     router.post("/admin/create-product", fileUploadMiddleware("image", "images/product"), postAdminProductPage);//Tạo mới data thì dùng post
+
+    router.post("/admin/delete-product/:id", postdeleteProduct);
+    router.get("/admin/view-product/:id", getViewProduct);
+    router.post("/admin/update-product", fileUploadMiddleware("image", "images/product"), postUpdateProduct);
+
 
     router.get("/admin/order", getAdminOrderPage);
 
