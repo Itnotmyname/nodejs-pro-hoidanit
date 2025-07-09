@@ -3,10 +3,8 @@ import { handleCreateUser, getAllUsers, handleDeleteUser, getUserById, updateUse
 
 const getHomePage = async (req: Request, res: Response) => {
     //get users
-    const users = await getAllUsers();
-    return res.render("home.ejs", {
-        users: users,
-    });
+
+    return res.render("client/home/show.ejs",);
 }
 
 const getCreateUserPage = async (req: Request, res: Response) => {
@@ -53,7 +51,7 @@ const postUpdateUser = async (req: Request, res: Response) => {
     const avatar = file?.filename ?? undefined;//Toán tử ? sẽ kiểm tra xem file có tồn tại hay không, nếu có thì lấy tên file, nếu không thì sẽ là undefined và ?? là để giá trị default nếu file không tồn tại thì sẽ là null
 
     //get user by id (lấy user thông qua id rồi truyền vào view-users)
-    await updateUserById(id, fullName,phone,role, address, avatar);
+    await updateUserById(id, fullName, phone, role, address, avatar);
 
     return res.redirect("/admin/user");
 }

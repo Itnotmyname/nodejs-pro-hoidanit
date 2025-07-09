@@ -25,7 +25,72 @@
                                 <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
                                 <li class="breadcrumb-item active">Products</li>
                             </ol>
-                            <div>table Products</div>
+                            <div>
+                                <div style="display: flex; justify-content:space-between;">
+                                    <h5>Table Products:</h5>
+                                    <div>
+                                        <a href="/admin/create-product" class="btn btn-warning">Create a product:</a>
+                                    </div>
+                                </div>
+                                <hr />
+                                <table class="table table-hover table-bordered">
+                                    <thead>
+                                        <th>Id</th>
+                                        <th>Name</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Description</th>
+                                        <th>Short Description</th>
+                                        <th>Target</th>
+                                        <th>Factory</th>
+                                        <th>Action</th>
+                                    </thead>
+
+                                    <tbody>
+                                        <% products.forEach( function (product) { %>
+                                            <tr>
+                                                <td>
+                                                    <%= product.id %>
+                                                </td>
+                                                <td>
+                                                    <%= product.name %>
+                                                </td>
+                                                <td>
+                                                    <%= product.price %>
+                                                </td>
+                                                <td>
+                                                    <%= product.quantity %>
+                                                </td>
+                                                <td>
+                                                    <%= product.detailDesc %>
+                                                </td>
+                                                <td>
+                                                    <%= product.shortDesc %>
+                                                </td>
+                                                <td>
+                                                    <%= product.target %>
+                                                </td>
+                                                <td>
+                                                    <%= product.factory %>
+                                                </td>
+                                                <td>
+                                                    <div style="display: flex; gap: 10px">
+                                                        <form action="/admin/view-user/<%= product.id %>" method="get">
+                                                            <button type="submit" class="btn btn-warning">View </button>
+                                                        </form>
+                                                        <form action="/admin/delete-user/<%= product.id %>"
+                                                            method="post">
+                                                            <button type="submit" class="btn btn-danger">Delete
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </main>
                     <%- include('../layout/footer'); -%>
@@ -35,3 +100,5 @@
             crossorigin="anonymous"></script>
         <script src="/admin/js/scripts.js"></script>
 </body>
+
+</html>
