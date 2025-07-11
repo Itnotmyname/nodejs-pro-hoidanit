@@ -9,6 +9,10 @@ const hashPassword = async (plainText: string) => {
     return await bcrypt.hash(plainText, saltRounds);
 }
 
+const comparePassword = async (plainText: string, hashPassword: string) => {
+    return await bcrypt.compare(plainText, hashPassword);
+}
+
 const handleCreateUser = async (
     fullName: string,
     email: string,
@@ -54,7 +58,7 @@ const getUserById = async (id: string) => {
     const user = prisma.user.findUnique({ where: { id: +id } });
     return user;
 }
-const updateUserById = async (id: string, fullName: string, phone: string,role:string, address: string, avatar: string) => {
+const updateUserById = async (id: string, fullName: string, phone: string, role: string, address: string, avatar: string) => {
     const updatedUser = await prisma.user.update({
         where: { id: +id }, //Mẹo dùng +id để convert id từ string sang number(int) chỉ áp dụng cho javascript
         data: {
@@ -71,5 +75,5 @@ const updateUserById = async (id: string, fullName: string, phone: string,role:s
 
 
 
-export { handleCreateUser, getAllUsers, handleDeleteUser, getUserById, updateUserById, getAllRoles, hashPassword };
+export { handleCreateUser, getAllUsers, handleDeleteUser, getUserById, updateUserById, getAllRoles, hashPassword, comparePassword };
 
