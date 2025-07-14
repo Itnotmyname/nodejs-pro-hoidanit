@@ -3,22 +3,32 @@ import { getCreateUserPage, getHomePage, postCreateUser, postDeleteUser, getView
 import { get } from 'http';
 import { getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage } from 'controllers/admin/dashboard.controllers';
 import fileUploadMiddleware from 'src/middleware/multer';
-import { getProductPage } from 'controllers/client/product.controller';
+import { getProductPage, postAddProductToCart } from 'controllers/client/product.controller';
 import { getAdminCreateProductPage, getViewProduct, postAdminProductPage, postdeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
-import { getLoginPage, getRegisterPage, postRegister } from 'controllers/client/auth.controller';
+import { getLoginPage, getRegisterPage, getSuccessRedirectPage, postLogout, postRegister } from 'controllers/client/auth.controller';
+import passport from 'passport';
+import { isAdmin, isLogin } from 'src/middleware/auth';
 
 const router = express.Router();
 
 const webRoutes = (app: Express) => {
     router.get("/", getHomePage);
+    router.get("/success-redirect", getSuccessRedirectPage); //Xem bài 114 phút 13:36 để hiểu ý tưởng 
     router.get("/product/:id", getProductPage);//Lấy data
-    router.get("/login",getLoginPage);
-    router.get("/register",getRegisterPage);
-    router.post("/register",postRegister);
+    router.get("/login", getLoginPage); //Theo quy tắc code chạy từ trái sang phải nên cho chạy qua isLogin của middleware trước rồi mới getLoginPage
+    router.post("/login", passport.authenticate('local', {
+        successRedirect: '/success-redirect',
+        failureRedirect: '/login',   //Xem bài 108 ,chỗ này là áp thư viện passport vào thôi và khai báo,tạo logic hàm login
+        failureMessage: true
+    }));
+    router.post("/logout", postLogout);
+    router.get("/register", getRegisterPage);
+    router.post("/register", postRegister);
 
+    router.post("/add-product-to-cart/:id", postAddProductToCart) //Xem bài 119 phút 2:20 ,phần id ở cuối chính là phần gọi productId
 
     //admin routes
-    router.get("/admin", getDashboardPage);
+    router.get("/admin", getDashboardPage);//Xem bài 114 phút 20 để hiểu tại sao lại có cái middleware isAdmin .Xem tiếp bài 116 từ phút thứ 4 để hiểu tại sao phải tối ưu middleware kiểu khác
     router.get("/admin/user", getAdminUserPage);
     router.get("/admin/create-user", getCreateUserPage);//Lấy data
     router.post("/admin/handle-create-user", fileUploadMiddleware("avatar"), postCreateUser);
@@ -37,7 +47,7 @@ const webRoutes = (app: Express) => {
 
     router.get("/admin/order", getAdminOrderPage);
 
-    app.use("/", router);
+    app.use("/", isAdmin, router);//xem bài 116 phút 4:13 để sử dụng trick này :áp dụng middleware vào đây luôn để tối ưu và sửa cả bên trong của function isAdmin 
 }
 
 export default webRoutes;

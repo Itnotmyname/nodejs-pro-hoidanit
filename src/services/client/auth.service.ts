@@ -1,7 +1,7 @@
 import { compare } from "bcrypt";
 import { prisma } from "config/client"
 import { ACCOUNT_TYPE } from "config/constant";
-import { comparePassword, hashPassword } from "services/user.service";
+import {  hashPassword } from "services/user.service";
 
 //Xem bài 104 để hiểu rõ hơn
 
@@ -41,26 +41,19 @@ const registerNewUser = async (
 
 }
 
-const handleLogin = async (username: string, password: string, callback: any) => {
-    //check user exist in database
-    const user = await prisma.user.findUnique({ //Xem bài 107 để biết lí do dùng Unique
-        where: { username: username }
-    })
-    if (!user) {
-        //throw error
-        // throw new Error(`Username:${username} not found`);
-        return callback(null, false, { message: 'Incorrect username or password.' });
-        //Xem bài 107 để hiểu rõ tại sao lại có false ở trên dòng 52
-    }
+const getUserWithRoleById=async(id:string)=>{
+    const user =await prisma.user.findUnique({
+        where:{ id:+id },
+        include:{           //xem bài 114 đây là cú pháp include của prisma hay joint của mySQL để lấy thêm dữ liệu từ bảng nào đó mà mình muốn thêm vào
+            role:true
+        },
+        omit:{   //Cú pháp này của prisma để không muốn hiển thị phần nào của mySQL (table nào) 
+            password:true
+        },
+    });
 
-    //compare password
-    const isMatch = await comparePassword(password, user.password);
-    if (!isMatch) {
-        // throw new Error(`Invalid password`);
-        return callback(null, false, { message: 'Invalid password' });
-    }
-    return callback(null, user);//Xem bài 107 để hiểu rõ hơn tại sao
-
+    // delete user.password; Đây là cú pháp của Javascript có thể là dùng cái này cũng được 
+    return user;
 }
 
-export { isEmailExist, registerNewUser, handleLogin };
+export { isEmailExist, registerNewUser, getUserWithRoleById };
