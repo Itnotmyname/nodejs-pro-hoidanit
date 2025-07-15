@@ -84,4 +84,19 @@ const addProductToCart = async (quantity: number, productId: number, user: Expre
     }
 }
 
-export { getProducts, getProductById, addProductToCart };
+const getProductInCart = async (userId: number) => {  // Xem bài 119 phút 6:10 để xem giải thích tại sao lại như vậy
+    const cart = await prisma.cart.findUnique({
+        where: { userId:userId }
+    })
+
+    if (cart) { //Nếu mà có giỏ hàng (tìm theo id á)
+        const currentCartDetail = await prisma.cartDetail.findMany({
+            where: { cartId: cart.id }, //Tìm theo cartId 
+            include: { product:true} //Đồng thời lấy thêm thông tin product thôi
+        })
+        return currentCartDetail; //Nếu có cart thì trả ra ,dùng findMany vì 1 giỏ hàng có nhiều sản phẩm
+    } 
+    return []; //Nếu ko có thì trả ra điều kiện array rỗng ,xem bài 122 khoảng phút 5
+}
+
+export { getProducts, getProductById, addProductToCart, getProductInCart };
