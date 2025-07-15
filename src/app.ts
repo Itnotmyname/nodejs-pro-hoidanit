@@ -56,7 +56,7 @@ configPassportLocal(); //Cần phải khai báo như thế này để cho nó bi
 //middleware
 app.use((req, res, next) => {
     res.locals.user = req.user || null; // Pass user object to all views
-    next();
+    next(); //Xem bài 121 để hiểu tại sao res.locals được chia sẻ data để sử dụng toàn cục mà ko phải khai báo tại phía controller 
 });
 
 

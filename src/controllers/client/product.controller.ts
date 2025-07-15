@@ -23,5 +23,13 @@ const postAddProductToCart= async (req:Request,res:Response)=>{
     return res.redirect("/");
 }
 
-export { getProductPage, postAddProductToCart };
+const getCardPage = async(req:Request,res:Response)=>{
+    const user = req.user;
+    if(!user){
+        return res.redirect("/login"); //Xem phút thứ 2 bài 121
+    }
+    return res.render("client/product/cart");
+}
+
+export { getProductPage, postAddProductToCart,getCardPage };
 

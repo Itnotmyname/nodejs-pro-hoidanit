@@ -3,7 +3,7 @@ import { getCreateUserPage, getHomePage, postCreateUser, postDeleteUser, getView
 import { get } from 'http';
 import { getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage } from 'controllers/admin/dashboard.controllers';
 import fileUploadMiddleware from 'src/middleware/multer';
-import { getProductPage, postAddProductToCart } from 'controllers/client/product.controller';
+import { getCardPage, getProductPage, postAddProductToCart } from 'controllers/client/product.controller';
 import { getAdminCreateProductPage, getViewProduct, postAdminProductPage, postdeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
 import { getLoginPage, getRegisterPage, getSuccessRedirectPage, postLogout, postRegister } from 'controllers/client/auth.controller';
 import passport from 'passport';
@@ -26,6 +26,7 @@ const webRoutes = (app: Express) => {
     router.post("/register", postRegister);
 
     router.post("/add-product-to-cart/:id", postAddProductToCart) //Xem bài 119 phút 2:20 ,phần id ở cuối chính là phần gọi productId
+    router.get("/cart", getCardPage);
 
     //admin routes
     router.get("/admin", getDashboardPage);//Xem bài 114 phút 20 để hiểu tại sao lại có cái middleware isAdmin .Xem tiếp bài 116 từ phút thứ 4 để hiểu tại sao phải tối ưu middleware kiểu khác
