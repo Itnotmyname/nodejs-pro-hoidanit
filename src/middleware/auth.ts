@@ -28,4 +28,6 @@ const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     next(); //Đối với client route thì vẫn chạy bình thường
 }
 
+
+
 export { isLogin, isAdmin };

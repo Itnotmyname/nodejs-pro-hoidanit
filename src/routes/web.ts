@@ -1,13 +1,14 @@
 import express, { Express } from 'express';
 import { getCreateUserPage, getHomePage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser } from 'controllers/user.controller';
 import { get } from 'http';
-import { getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage } from 'controllers/admin/dashboard.controllers';
+import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage } from 'controllers/admin/dashboard.controllers';
 import fileUploadMiddleware from 'src/middleware/multer';
-import { getCardPage, getProductPage, postAddProductToCart } from 'controllers/client/product.controller';
-import { getAdminCreateProductPage, getViewProduct, postAdminProductPage, postdeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
+import { getCardPage, getCheckOutPage, getProductPage, getThanksPage, postAddProductToCart, postDeleteProductInCart, postHandleCartToCheckOut, postPlaceOrder } from 'controllers/client/product.controller';
+import { getAdminCreateProductPage, getViewProduct, postAdminProductPage, postDeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
 import { getLoginPage, getRegisterPage, getSuccessRedirectPage, postLogout, postRegister } from 'controllers/client/auth.controller';
 import passport from 'passport';
 import { isAdmin, isLogin } from 'src/middleware/auth';
+import { checkCart } from 'src/middleware/checkcart';
 
 const router = express.Router();
 
@@ -26,7 +27,13 @@ const webRoutes = (app: Express) => {
     router.post("/register", postRegister);
 
     router.post("/add-product-to-cart/:id", postAddProductToCart) //Xem bài 119 phút 2:20 ,phần id ở cuối chính là phần gọi productId
-    router.get("/cart", getCardPage);
+    router.get("/cart", checkCart, getCardPage);
+    router.post("/delete-product-in-cart/:id", checkCart, postDeleteProductInCart);
+    router.post("/handle-cart-to-checkout", postHandleCartToCheckOut)
+    router.get("/checkout", getCheckOutPage); //Xem bài 125
+    router.post("/place-order", postPlaceOrder); //Xem bài 127
+    router.get("/thanks", getThanksPage);
+
 
     //admin routes
     router.get("/admin", getDashboardPage);//Xem bài 114 phút 20 để hiểu tại sao lại có cái middleware isAdmin .Xem tiếp bài 116 từ phút thứ 4 để hiểu tại sao phải tối ưu middleware kiểu khác
@@ -41,12 +48,12 @@ const webRoutes = (app: Express) => {
     router.get("/admin/create-product", getAdminCreateProductPage);//Lấy data thì dùng get
     router.post("/admin/create-product", fileUploadMiddleware("image", "images/product"), postAdminProductPage);//Tạo mới data thì dùng post
 
-    router.post("/admin/delete-product/:id", postdeleteProduct);
+    router.post("/admin/delete-product/:id", postDeleteProduct);
     router.get("/admin/view-product/:id", getViewProduct);
     router.post("/admin/update-product", fileUploadMiddleware("image", "images/product"), postUpdateProduct);
 
-
     router.get("/admin/order", getAdminOrderPage);
+    router.get("/admin/order/:id", getAdminOrderDetailPage); //Xem bài 128
 
     app.use("/", isAdmin, router);//xem bài 116 phút 4:13 để sử dụng trick này :áp dụng middleware vào đây luôn để tối ưu và sửa cả bên trong của function isAdmin 
 }

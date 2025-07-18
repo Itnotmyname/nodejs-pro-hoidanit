@@ -1,5 +1,6 @@
 import exp from "constants";
 import { Request, Response } from "express";
+import { getOrderAdmin, getOrderDetailAdmin } from "services/admin/order.services";
 import { getProductList } from "services/admin/product.service";
 import { getAllUsers } from "services/user.service";
 
@@ -21,8 +22,23 @@ const products= await getProductList();
 }
 
 const getAdminOrderPage = async (req: Request, res: Response) => {
-
-    return res.render("admin/order/show.ejs");
+ 
+    const orders = await getOrderAdmin();
+    return res.render("admin/order/show.ejs",{
+        orders:orders,  //Xem baì 128 phút 2:30 ,đây là truyền qua biến function order
+    });
 }
 
-export { getDashboardPage, getAdminUserPage, getAdminProductPage, getAdminOrderPage };
+const getAdminOrderDetailPage = async(req:Request, res:Response) =>{
+    const {id}=req.params;
+
+    const orderDetails = await getOrderDetailAdmin(+id);
+
+    return res.render("admin/order/detail.ejs",{
+        orderDetails:orderDetails,
+        id:id,
+    })
+
+}
+
+export { getDashboardPage, getAdminUserPage, getAdminProductPage, getAdminOrderPage, getAdminOrderDetailPage };

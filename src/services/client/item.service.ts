@@ -86,17 +86,107 @@ const addProductToCart = async (quantity: number, productId: number, user: Expre
 
 const getProductInCart = async (userId: number) => {  // Xem bài 119 phút 6:10 để xem giải thích tại sao lại như vậy
     const cart = await prisma.cart.findUnique({
-        where: { userId:userId }
+        where: { userId: userId }
     })
 
     if (cart) { //Nếu mà có giỏ hàng (tìm theo id á)
         const currentCartDetail = await prisma.cartDetail.findMany({
             where: { cartId: cart.id }, //Tìm theo cartId 
-            include: { product:true} //Đồng thời lấy thêm thông tin product thôi
+            include: { product: true } //Đồng thời lấy thêm thông tin product thôi,hàm include của prisma sẽ khá giống truy vấn JOIN của mySQL là kiểu truy vấn thuộc tính giữa bảng cart_detail và bảng products.Do đó khi di chuột vào cartDetails ta lại thấy có các thuộc tính của products
         })
         return currentCartDetail; //Nếu có cart thì trả ra ,dùng findMany vì 1 giỏ hàng có nhiều sản phẩm
-    } 
+    }
     return []; //Nếu ko có thì trả ra điều kiện array rỗng ,xem bài 122 khoảng phút 5
 }
 
-export { getProducts, getProductById, addProductToCart, getProductInCart };
+const deleteProductInCart = async (cartDetailId: number, userId: number, sumCart: number) => {  // Xem bài 119 phút 6:10 để xem giải thích tại sao lại như vậy
+    //xóa cart-detail
+    const cartDetail = await prisma.cartDetail.delete({
+        where: { id: cartDetailId }
+    })
+
+    if (sumCart === 1) {
+        await prisma.cart.delete({
+            where: { userId: userId }, //Tìm theo cartId 
+        })
+    } else {
+        //update cart 
+        await prisma.cart.update({
+            where: { userId: userId },
+            data: {
+                sum: {
+                    decrement: 1, //Xem bài 124 phút 04:28 ,đây là hàm logic của prisma ,trừ đi 1 đơn vị
+                }
+            }
+        })
+    }
+
+    return []; //Nếu ko có thì trả ra điều kiện array rỗng ,xem bài 122 khoảng phút 5
+}
+
+const updateCartDetailBeforeCheckout = async (data: { id: string; quantity: string }[]) => { //Cái :{id:string;quantity:string} là đang quy định kiểu type cho data ,còn bản chất là data[] thôi
+    for (let i = 0; i < data.length; i++) {
+        await prisma.cartDetail.update({  //Xem phút thứ 10 bài 126
+            where: {
+                id: +(data[i].id)
+            },
+            data: {
+                quantity: +(data[i].quantity) //convert sang daạng number
+            }
+        })
+    }
+}
+
+const handlerPlaceOrder = async (
+    userId: number,
+    receiverName: string,
+    receiverAddress: string,
+    receiverPhone: string,
+    totalPrice: number,
+) => {
+
+    const cart = await prisma.cart.findUnique({
+        where: { userId: userId },
+        include: {
+            cartDetails: true
+        }
+    });
+    if (cart) {
+        //create order
+        const dataOrderDetail = cart?.cartDetails?.map(
+            item => ({
+                price: item.price,
+                quantity: item.quantity,
+                productId: item.productId
+            })
+        ) ?? [];
+
+        await prisma.order.create({
+            data: {
+                receiverName: receiverName,
+                receiverAddress: receiverAddress,
+                receiverPhone: receiverPhone,
+                paymentMethod: "COD",
+                paymentStatus: "PAYMENT_UNPAID",
+                status: "PENDING",
+                totalPrice: totalPrice, //Xem bài 125 phút 13 gần phút 15
+                userId: userId,
+                orderDetails: {
+                    create: dataOrderDetail,
+                }
+            }
+        })
+
+        //remove cart detail + cart 
+        await prisma.cartDetail.deleteMany({
+            where: { cartId: cart.id } //xóa theo điều kiện where ở đây là id của bảng carts trong mySQL rồi sau đó mới gán value cho cartId .Rồi lúc này mới xóa theo điều kiện cartId của bảng cart_detail
+        }) //xóa nhiều bản ghi 1 lúc  ,xem file doc để hiểu hơn 
+
+        await prisma.cart.delete({
+            where: { id: cart.id }
+        })
+    }
+
+}
+
+export { getProducts, getProductById, addProductToCart, getProductInCart, deleteProductInCart, updateCartDetailBeforeCheckout, handlerPlaceOrder };

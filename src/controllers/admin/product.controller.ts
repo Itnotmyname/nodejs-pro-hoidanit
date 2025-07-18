@@ -46,7 +46,7 @@ const postAdminProductPage = async (req: Request, res: Response) => {
     return res.redirect("/admin/product");
 }
 
-const postdeleteProduct = async (req: Request, res: Response) => {
+const postDeleteProduct = async (req: Request, res: Response) => {
     const { id } = req.params;  //Lấy id từ params  
     await handleDeleteProduct(+id);
     return res.redirect("/admin/product");
@@ -91,6 +91,6 @@ const postUpdateProduct = async (req: Request, res: Response) => {
     return res.redirect("/admin/product");
 }
 
-export { getAdminCreateProductPage, postAdminProductPage, postdeleteProduct , getViewProduct, postUpdateProduct };
+export { getAdminCreateProductPage, postAdminProductPage, postDeleteProduct , getViewProduct, postUpdateProduct };
 
 
