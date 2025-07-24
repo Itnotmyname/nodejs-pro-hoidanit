@@ -3,7 +3,7 @@ import { getCreateUserPage, getHomePage, postCreateUser, postDeleteUser, getView
 import { get } from 'http';
 import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage } from 'controllers/admin/dashboard.controllers';
 import fileUploadMiddleware from 'src/middleware/multer';
-import { getCardPage, getCheckOutPage, getProductPage, getThanksPage, postAddProductToCart, postDeleteProductInCart, postHandleCartToCheckOut, postPlaceOrder } from 'controllers/client/product.controller';
+import { getCardPage, getCheckOutPage, getOrderHistoryPage, getProductPage, getThanksPage, postAddProductToCart, postAddToCartFromDetailPage, postDeleteProductInCart, postHandleCartToCheckOut, postPlaceOrder } from 'controllers/client/product.controller';
 import { getAdminCreateProductPage, getViewProduct, postAdminProductPage, postDeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
 import { getLoginPage, getRegisterPage, getSuccessRedirectPage, postLogout, postRegister } from 'controllers/client/auth.controller';
 import passport from 'passport';
@@ -27,12 +27,14 @@ const webRoutes = (app: Express) => {
     router.post("/register", postRegister);
 
     router.post("/add-product-to-cart/:id", postAddProductToCart) //Xem bài 119 phút 2:20 ,phần id ở cuối chính là phần gọi productId
-    router.get("/cart", checkCart, getCardPage);
-    router.post("/delete-product-in-cart/:id", checkCart, postDeleteProductInCart);
+    router.get("/cart", getCardPage); //checkCart
+    router.post("/delete-product-in-cart/:id",  postDeleteProductInCart);//checkCart
     router.post("/handle-cart-to-checkout", postHandleCartToCheckOut)
     router.get("/checkout", getCheckOutPage); //Xem bài 125
     router.post("/place-order", postPlaceOrder); //Xem bài 127
     router.get("/thanks", getThanksPage);
+    router.get("/order-history",getOrderHistoryPage); //Xem bài 129 phút 1:30 để hiểu ý tưởng
+    router.post("/add-to-cart-from-detail-page/:id", postAddToCartFromDetailPage); //Xem bài 130 phút 9 để hiểu ý tưởng
 
 
     //admin routes

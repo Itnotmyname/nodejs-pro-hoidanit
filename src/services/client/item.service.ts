@@ -1,5 +1,6 @@
 
 import { prisma } from "config/client";
+import e from "express";
 
 const getProducts = async () => {
     const products = await prisma.product.findMany();
@@ -34,11 +35,7 @@ const addProductToCart = async (quantity: number, productId: number, user: Expre
                 }
             }
         })
-        //update card-detail
-        //Nếu chưa có tạo mới còn có rồi thì cập nhật quantity
-        //upsert là viết tắt của từ update+insert :nếu đã tồn tại thì cập nhật còn nếu ko tồn tại thì insert ,xem bài 120 phút 4:50
 
-        //Xem baif 120 phút 7 để hiểu tại sao cần tạo currentCartDetail cũng như sử dụng findFirst của prisma để query ra giá trị gần nhất
         const currentCartDetail = await prisma.cartDetail.findFirst({
             where: {
                 productId: productId,
@@ -66,7 +63,7 @@ const addProductToCart = async (quantity: number, productId: number, user: Expre
 
     } else {
         //create
-        await prisma.cart.create({ //Xem bài 119 phút thứ 11 để hiểu nhé
+        const currentCartDetailelse = await prisma.cart.create({ //Xem bài 119 phút thứ 11 để hiểu nhé
             data: {
                 sum: quantity,
                 userId: (user as any).id, //Tạm thời thêm kiểu user as any này vào nếu ko sẽ có lỗi "Property 'id' does not exist on type 'User'"
@@ -81,6 +78,7 @@ const addProductToCart = async (quantity: number, productId: number, user: Expre
                 }
             }
         })
+        console.log(currentCartDetailelse);
     }
 }
 
@@ -94,6 +92,7 @@ const getProductInCart = async (userId: number) => {  // Xem bài 119 phút 6:10
             where: { cartId: cart.id }, //Tìm theo cartId 
             include: { product: true } //Đồng thời lấy thêm thông tin product thôi,hàm include của prisma sẽ khá giống truy vấn JOIN của mySQL là kiểu truy vấn thuộc tính giữa bảng cart_detail và bảng products.Do đó khi di chuột vào cartDetails ta lại thấy có các thuộc tính của products
         })
+        console.log(currentCartDetail);
         return currentCartDetail; //Nếu có cart thì trả ra ,dùng findMany vì 1 giỏ hàng có nhiều sản phẩm
     }
     return []; //Nếu ko có thì trả ra điều kiện array rỗng ,xem bài 122 khoảng phút 5
@@ -101,13 +100,22 @@ const getProductInCart = async (userId: number) => {  // Xem bài 119 phút 6:10
 
 const deleteProductInCart = async (cartDetailId: number, userId: number, sumCart: number) => {  // Xem bài 119 phút 6:10 để xem giải thích tại sao lại như vậy
     //xóa cart-detail
-    const cartDetail = await prisma.cartDetail.delete({
+    const currentCartDetail = await prisma.cartDetail.findUnique({
         where: { id: cartDetailId }
-    })
+    });
+    if (!currentCartDetail) {
+        // Có thể trả về hoặc throw error, hoặc return [] để kết thúc hàm
+        return [];
+    }
+    const quantities = currentCartDetail.quantity; //Lấy quantity của sản phẩm trong giỏ hàng để trừ đi
+
+    await prisma.cartDetail.delete({
+        where: { id: cartDetailId }
+    });
 
     if (sumCart === 1) {
         await prisma.cart.delete({
-            where: { userId: userId }, //Tìm theo cartId 
+            where: { userId: userId }, //Tìm theo cart
         })
     } else {
         //update cart 
@@ -115,18 +123,23 @@ const deleteProductInCart = async (cartDetailId: number, userId: number, sumCart
             where: { userId: userId },
             data: {
                 sum: {
-                    decrement: 1, //Xem bài 124 phút 04:28 ,đây là hàm logic của prisma ,trừ đi 1 đơn vị
+                    decrement: quantities, //Xem bài 124 phút 04:28 ,đây là hàm logic của prisma ,trừ đi 1 đơn vị .Đã sửa đổi lại tại bào 130 phút 6:20
                 }
             }
         })
     }
 
-    return []; //Nếu ko có thì trả ra điều kiện array rỗng ,xem bài 122 khoảng phút 5
+    return []; //Nếu ko có thì trả ra điều kiện array rỗng ,xem bài 124 khoảng phút 5
 }
 
-const updateCartDetailBeforeCheckout = async (data: { id: string; quantity: string }[]) => { //Cái :{id:string;quantity:string} là đang quy định kiểu type cho data ,còn bản chất là data[] thôi
+const updateCartDetailBeforeCheckout = async (data: { id: string; quantity: string }[],
+    cartId: string
+) => { //Cái :{id:string;quantity:string} là đang quy định kiểu type cho data ,còn bản chất là data[] thôi
+    let quantity = 0;
+
     for (let i = 0; i < data.length; i++) {
-        await prisma.cartDetail.update({  //Xem phút thứ 10 bài 126
+        quantity += +(data[i].quantity); //Cộng dồn quantity của các sản phẩm trong giỏ hàng để tính tổng số lượng sản phẩm ,bản chất là : quantity = quantity + +(data[i].quantity) .Lưu ý là phải convert sang kiểu number vì data[i].quantity là kiểu string
+        const updatecartdettail = await prisma.cartDetail.update({  //Xem phút thứ 10 bài 126
             where: {
                 id: +(data[i].id)
             },
@@ -134,7 +147,17 @@ const updateCartDetailBeforeCheckout = async (data: { id: string; quantity: stri
                 quantity: +(data[i].quantity) //convert sang daạng number
             }
         })
+        console.log(updatecartdettail);
     }
+
+    //update cart sum
+    const updatecartsum = await prisma.cart.update({
+        where: { id: +cartId },
+        data: {
+            sum: quantity,
+        }
+    })
+    console.log(updatecartsum);
 }
 
 const handlerPlaceOrder = async (
@@ -144,49 +167,98 @@ const handlerPlaceOrder = async (
     receiverPhone: string,
     totalPrice: number,
 ) => {
+    try {
+        //tạo transaction
+        await prisma.$transaction(async (giaodich) => {
 
-    const cart = await prisma.cart.findUnique({
-        where: { userId: userId },
-        include: {
-            cartDetails: true
-        }
-    });
-    if (cart) {
-        //create order
-        const dataOrderDetail = cart?.cartDetails?.map(
-            item => ({
-                price: item.price,
-                quantity: item.quantity,
-                productId: item.productId
-            })
-        ) ?? [];
-
-        await prisma.order.create({
-            data: {
-                receiverName: receiverName,
-                receiverAddress: receiverAddress,
-                receiverPhone: receiverPhone,
-                paymentMethod: "COD",
-                paymentStatus: "PAYMENT_UNPAID",
-                status: "PENDING",
-                totalPrice: totalPrice, //Xem bài 125 phút 13 gần phút 15
-                userId: userId,
-                orderDetails: {
-                    create: dataOrderDetail,
+            const cart = await giaodich.cart.findUnique({
+                where: { userId: userId },
+                include: {
+                    cartDetails: true
                 }
+            });
+            if (cart) {
+
+                //create order
+                const dataOrderDetail = cart?.cartDetails?.map(
+                    item => ({
+                        price: item.price,
+                        quantity: item.quantity,
+                        productId: item.productId
+                    })
+                ) ?? [];
+
+                await giaodich.order.create({
+                    data: {
+                        receiverName: receiverName,
+                        receiverAddress: receiverAddress,
+                        receiverPhone: receiverPhone,
+                        paymentMethod: "COD",
+                        paymentStatus: "PAYMENT_UNPAID",
+                        status: "PENDING",
+                        totalPrice: totalPrice, //Xem bài 125 phút 13 gần phút 15
+                        userId: userId,
+                        orderDetails: {
+                            create: dataOrderDetail,
+                        }
+                    }
+                })
+
+
+
+                //check product
+                for (let i = 0; i < cart.cartDetails.length; i++) {
+                    const productId = cart.cartDetails[i].productId;
+                    const product = await giaodich.product.findUnique({
+                        where: { id: productId }
+                    });
+
+                    if (!product || product.quantity < cart.cartDetails[i].quantity) {
+                        throw new Error(`"Sản phẩm ${product?.name} không tồn tại hoặc không đủ số lượng để đặt hàng"`);
+                    }
+
+                    const testne = await giaodich.product.update({
+                        where: { id: productId },
+                        data: {
+                            quantity: {
+                                decrement: cart.cartDetails[i].quantity,
+                            },
+                            sold: {
+                                increment: cart.cartDetails[i].quantity,
+                            }
+                        }
+                    })
+                }
+
+                //remove cart detail + cart 
+                await giaodich.cartDetail.deleteMany({
+                    where: { cartId: cart.id } //xóa theo điều kiện where ở đây là id của bảng carts trong mySQL rồi sau đó mới gán value cho cartId .Rồi lúc này mới xóa theo điều kiện cartId của bảng cart_detail
+                }) //xóa nhiều bản ghi 1 lúc  ,xem file doc để hiểu hơn 
+
+                await giaodich.cart.delete({
+                    where: { id: cart.id }
+                })
             }
         })
-
-        //remove cart detail + cart 
-        await prisma.cartDetail.deleteMany({
-            where: { cartId: cart.id } //xóa theo điều kiện where ở đây là id của bảng carts trong mySQL rồi sau đó mới gán value cho cartId .Rồi lúc này mới xóa theo điều kiện cartId của bảng cart_detail
-        }) //xóa nhiều bản ghi 1 lúc  ,xem file doc để hiểu hơn 
-
-        await prisma.cart.delete({
-            where: { id: cart.id }
-        })
+        return "";
+    } catch (error) {
+        console.log(error)
+        return error.message; //Trả về thông báo lỗi nếu có
     }
 
 }
 
-export { getProducts, getProductById, addProductToCart, getProductInCart, deleteProductInCart, updateCartDetailBeforeCheckout, handlerPlaceOrder };
+const getOrderHistory = async (userId: number) => {
+    return await prisma.order.findMany({
+        where: { userId: userId },
+        include: {    //Xem baì 129 phút 2 vì đây là trường hợp bọc 3 lớp include của prisma
+            orderDetails: {
+                include: {
+                    product: true
+                }
+            }
+        },
+    });
+}
+
+export { getProducts, getProductById, addProductToCart, getProductInCart, deleteProductInCart, updateCartDetailBeforeCheckout, handlerPlaceOrder, getOrderHistory };

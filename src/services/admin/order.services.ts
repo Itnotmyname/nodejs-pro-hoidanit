@@ -9,7 +9,7 @@ const getOrderAdmin = async () => { //Xem bài 128
 
 const getOrderDetailAdmin = async (orderId :number) =>{
     return await prisma.orderDetail.findMany({
-        where:{orderId},
+        where:{orderId:orderId},
         include:{product:true}
     });
 }

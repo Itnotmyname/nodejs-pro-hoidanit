@@ -170,6 +170,12 @@
         const el = document.getElementById(`cartDetails[${index}]`);//Sau khi có đc rồi thì gán giá trị theo id ,cái phần id này (hay `cartDetails[${index}]`) lấy ở :tại dòng 195 ở cart.ejs ta có đặt id="cartDetails[<%= index %>]" 
         $(el).val(newVal);//Cập nhật giá trị theo id .Mà input.val(newVal) ở ngay trên .Có nghĩa là ở đây cập nhật giá trị cho input ngay phía trên
 
+        //set quantity for detail page
+        const elDetail = document.getElementById("quantityDetail");//Đây là lấy ra id="quantityDetail" ở dòng 107 của file detail.ejs
+        if (elDetail) {
+            $(elDetail).val(newVal); //Cập nhật giá trị cho id="quantityDetail" ở dòng 107 của file detail.ejs
+        }
+
         //get price
         const price = input.attr("data-cart-detail-price"); //input ở đây là ở html và nhớ xem bài 123 phút 14:10 .Sau đó lấy tới thuộc tính data-cart-detail-price.Tức là lấy ra giá tiền đó
         const id = input.attr("data-cart-detail-id");//Tiếp đến chúng ta cần lấy ra id vì để có thể biết chúng ta đang thao tác với row nào trên table của mySQL

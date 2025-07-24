@@ -5,8 +5,8 @@ import { handleCreateUser, getAllUsers, handleDeleteUser, getUserById, updateUse
 const getHomePage = async (req: Request, res: Response) => {
 
     const products = await getProducts();
-    const user = req.user;
-    console.log("current use: ",user)
+    const { page } = req.query;//Xem bài 136 phút 3:50 để hiểu
+    console.log("current query: ", page); //Xem bài 136 để hiểu về query.string
     return res.render("client/home/show.ejs", {
         products: products  //Xem bài 100 để hiểu về truyền data product sản phẩm
     });
