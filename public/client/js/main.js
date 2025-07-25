@@ -218,5 +218,20 @@
         }).format(value) //Phần này chả khác gì phần VND của ejs chả qua viết ra ngoài cho gọn 
     }
 
+    //add active cho client
+    const navElement = $("#navbarCollapse");
+    const currentUrl = window.location.pathname;
+    navElement.find('a.nav-link').each(function () {
+        const link = $(this); // Get the current link in the loop
+        const href = link.attr('href'); // Get the href attribute of the link
+
+        if (href === currentUrl) {
+            link.addClass('active'); // Add 'active' class if the href matches the current URL
+        } else {
+            link.removeClass('active'); // Remove 'active' class if the href does not match
+        }
+    });
+
+
 })(jQuery); //Nhận dạng jQuery thông qua dấu $ 
 

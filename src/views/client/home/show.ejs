@@ -83,7 +83,6 @@
                                             <div class="row g-4">
                                                 <% products.forEach( function (product) { %>
                                                     <!--Xem bài 100 phút 17:30 để biết hay cỡ nào nhé -->
-
                                                     <div class="col-md-6 col-lg-4 col-xl-3">
                                                         <div class="rounded position-relative fruite-item">
                                                             <div class="fruite-img">
@@ -110,7 +109,8 @@
                                                                             }).format(product.price) %>
                                                                     </p>
                                                                     <form method="post"
-                                                                        action="/add-product-to-cart/<%= product.id %>">  <!-- Xem bài 119  -->
+                                                                        action="/add-product-to-cart/<%= product.id %>">
+                                                                        <!-- Xem bài 119  -->
                                                                         <button
                                                                             class="mx-auto btn border border-secondary rounded-pill px-3 text-primary">
                                                                             <i
@@ -123,6 +123,32 @@
                                                         </div>
                                                     </div>
                                                     <% }) %>
+                                                        <!-- //add pagination -->
+                                                        <div class="pagination d-flex justify-content-center mt-5">
+                                                            <li
+                                                                class="<%= page === 1 ? 'disabled page-item' : 'page-item' %> ">
+                                                                <a class="page-link" href="/?page=<%= page - 1  %>"
+                                                                    aria-label="Previous">
+                                                                    <span aria-hidden="true">&laquo;</span>
+                                                                </a>
+                                                            </li>
+                                                            <% for(var i=1; i <=totalPages; i++) {%>
+                                                                <li class="page-item">
+                                                                    <a class="<%= page === i ? 'active page-link' : 'page-link' %>"
+                                                                        href="/?page=<%= i  %>">
+                                                                        <%= i %>
+                                                                    </a>
+                                                                </li>
+                                                                <% } %>
+                                                                    <li
+                                                                        class="<%= page === totalPages ? 'disabled page-item' : 'page-item' %> ">
+                                                                        <a class="page-link"
+                                                                            href="/?page=<%= page + 1  %>"
+                                                                            aria-label="Next">
+                                                                            <span aria-hidden="true">&raquo;</span>
+                                                                        </a>
+                                                                    </li>
+                                                        </div>
                                             </div>
                                         </div>
                                     </div>

@@ -1,8 +1,8 @@
 import exp from "constants";
 import { Request, Response } from "express";
 import { getDashboardInfo } from "services/admin/dashboard.service";
-import { getOrderAdmin, getOrderDetailAdmin } from "services/admin/order.services";
-import { getProductList } from "services/admin/product.service";
+import { countTotalOrderPages, getOrderAdmin, getOrderDetailAdmin } from "services/admin/order.services";
+import { countTotalProductPages, getProductList } from "services/admin/product.service";
 import { countTotalUserPages, getAllUsers } from "services/user.service";
 
 const getDashboardPage = async (req: Request, res: Response) => {
@@ -25,20 +25,41 @@ const getAdminUserPage = async (req: Request, res: Response) => {
     return res.render("admin/user/show.ejs", {
         users: users,   //Nếu key:value giống nhau thì có thể viết ngắn gọn là users
         totalPages: +totalPages, //Truyền vào view để hiển thị số trang
-        page: +page, //Truyền vào view để hiển thị số trang hiện tại
+        page: +currentPage, //Truyền vào view để hiển thị số trang hiện tại
     });
 }
 
 const getAdminProductPage = async (req: Request, res: Response) => {
-    const products = await getProductList();
-    return res.render("admin/product/show.ejs", { products });
+    const { page } = req.query; //Xem bài 138 phút 1:35 để hiểu
+
+    let currentPage = page ? +page : 1; //Nếu có page thì convert sang number, nếu không thì mặc định là 1
+    if (currentPage <= 0) {
+        currentPage = 1; //Nếu page nhỏ hơn hoặc bằng 0 thì mặc định là 1 ,điều này giúp không thể lấy page âm hoặc page 0
+    }
+
+    const products = await getProductList(currentPage);
+    const totalPages = await countTotalProductPages();
+    return res.render("admin/product/show.ejs", {
+        products: products,
+        totalPages: +totalPages,
+        page: +currentPage //Lấy currentPage để sáng xanh hiện thị số trang khi mới vào hiện tại
+    }); //Truyền vào view để hiển thị số trang và sản phẩm
 }
 
 const getAdminOrderPage = async (req: Request, res: Response) => {
+const { page } = req.query; //Xem bài 138 phút 1:35 để hiểu
 
-    const orders = await getOrderAdmin();
+    let currentPage = page ? +page : 1; //Nếu có page thì convert sang number, nếu không thì mặc định là 1
+    if (currentPage <= 0) {
+        currentPage = 1; //Nếu page nhỏ hơn hoặc bằng 0 thì mặc định là 1 ,điều này giúp không thể lấy page âm hoặc page 0
+    }
+
+    const orders = await getOrderAdmin(currentPage);
+    const totalPages = await countTotalOrderPages(); 
     return res.render("admin/order/show.ejs", {
-        orders: orders,  //Xem baì 128 phút 2:30 ,đây là truyền qua biến function order
+        orders: orders,
+        totalPages: +totalPages,
+        page: +currentPage //Lấy currentPage để sáng xanh hiện thị số trang khi mới vào hiện tại
     });
 }
 

@@ -1,5 +1,5 @@
 import express, { Express } from 'express';
-import { getCreateUserPage, getHomePage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser } from 'controllers/user.controller';
+import { getCreateUserPage, getHomePage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser, getProductFilterPage } from 'controllers/user.controller';
 import { get } from 'http';
 import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage } from 'controllers/admin/dashboard.controllers';
 import fileUploadMiddleware from 'src/middleware/multer';
@@ -14,6 +14,8 @@ const router = express.Router();
 
 const webRoutes = (app: Express) => {
     router.get("/", getHomePage);
+    router.get("/products", getProductFilterPage); //Xem bài 141 phút 04:40 
+
     router.get("/success-redirect", getSuccessRedirectPage); //Xem bài 114 phút 13:36 để hiểu ý tưởng 
     router.get("/product/:id", getProductPage);//Lấy data
     router.get("/login", getLoginPage); //Theo quy tắc code chạy từ trái sang phải nên cho chạy qua isLogin của middleware trước rồi mới getLoginPage
@@ -28,12 +30,12 @@ const webRoutes = (app: Express) => {
 
     router.post("/add-product-to-cart/:id", postAddProductToCart) //Xem bài 119 phút 2:20 ,phần id ở cuối chính là phần gọi productId
     router.get("/cart", getCardPage); //checkCart
-    router.post("/delete-product-in-cart/:id",  postDeleteProductInCart);//checkCart
+    router.post("/delete-product-in-cart/:id", postDeleteProductInCart);//checkCart
     router.post("/handle-cart-to-checkout", postHandleCartToCheckOut)
     router.get("/checkout", getCheckOutPage); //Xem bài 125
     router.post("/place-order", postPlaceOrder); //Xem bài 127
     router.get("/thanks", getThanksPage);
-    router.get("/order-history",getOrderHistoryPage); //Xem bài 129 phút 1:30 để hiểu ý tưởng
+    router.get("/order-history", getOrderHistoryPage); //Xem bài 129 phút 1:30 để hiểu ý tưởng
     router.post("/add-to-cart-from-detail-page/:id", postAddToCartFromDetailPage); //Xem bài 130 phút 9 để hiểu ý tưởng
 
 

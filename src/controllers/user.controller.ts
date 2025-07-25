@@ -1,14 +1,39 @@
 import { Request, Response } from "express";
-import { getProducts } from "services/client/item.service";
+import { countTotalProductClientPages, getProducts } from "services/client/item.service";
 import { handleCreateUser, getAllUsers, handleDeleteUser, getUserById, updateUserById, getAllRoles } from "services/user.service";
 
 const getHomePage = async (req: Request, res: Response) => {
+    const { page } = req.query;//Xem bài 136 phút 3:50 để hiểu và 141 phút 3:27
 
-    const products = await getProducts();
-    const { page } = req.query;//Xem bài 136 phút 3:50 để hiểu
-    console.log("current query: ", page); //Xem bài 136 để hiểu về query.string
+
+    let currentPage = page ? +page : 1; //Nếu có page thì convert sang number, nếu không thì mặc định là 1
+    if (currentPage <= 0) {
+        currentPage = 1; //Nếu page nhỏ hơn hoặc bằng 0 thì mặc định là 1 ,điều này giúp không thể lấy page âm hoặc page 0
+    }
+
+    const products = await getProducts(currentPage, 8);
+    const totalPages = await countTotalProductClientPages(8); //Xem bài 141 phút 3:32 để hiểu
     return res.render("client/home/show.ejs", {
-        products: products  //Xem bài 100 để hiểu về truyền data product sản phẩm
+        products: products,
+        totalPages: +totalPages, //Truyền vào view để hiển thị số trang
+        page: +currentPage, //Truyền vào view để hiển thị số trang
+    });
+}
+
+const getProductFilterPage = async (req: Request, res: Response) => {
+    const { page } = req.query;
+
+    let currentPage = page ? +page : 1; //Nếu có page thì convert sang number, nếu không thì mặc định là 1
+    if (currentPage <= 0) {
+        currentPage = 1; //Nếu page nhỏ hơn hoặc bằng 0 thì mặc định là 1 ,điều này giúp không thể lấy page âm hoặc page 0
+    }
+
+    const products = await getProducts(currentPage, 6);
+    const totalPages = await countTotalProductClientPages(6); //Xem bài 141 phút 05:00 để hiểu
+    return res.render("client/product/filter.ejs", {
+        products: products,
+        totalPages: +totalPages, //Truyền vào view để hiển thị số trang
+        page: +currentPage, //Truyền vào view để hiển thị số trang
     });
 }
 
@@ -62,4 +87,4 @@ const postUpdateUser = async (req: Request, res: Response) => {
 }
 
 
-export { getHomePage, getCreateUserPage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser };
+export { getHomePage, getCreateUserPage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser, getProductFilterPage };
