@@ -43,7 +43,7 @@
     <%- include('../layout/header'); -%>
         <div class="py-1"></div>
         <!-- Single Product Start -->
-        <div class="container-fluid ">
+        <div class="container-fluid">
             <div class="container">
                 <div class="row g-4 mb-5">
                     <div>
@@ -58,8 +58,8 @@
 
                     <div class="row g-4 fruite">
                         <div class="col-12 col-md-4">
-                            <div class="row g-4"> <!--Phần filter rộng 4 column bên trái -->
-                                <div class="col-12">
+                            <div class="row g-4">
+                                <div class="col-12" id="factoryFilter">
                                     <div class="mb-2"><b>Hãng sản xuất</b></div>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="checkbox" id="factory-1" value="APPLE">
@@ -89,7 +89,7 @@
                                     </div>
 
                                 </div>
-                                <div class="col-12">
+                                <div class="col-12" id="targetFilter">
                                     <div class="mb-2"><b>Mục đích sử dụng</b></div>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="checkbox" id="target-1" value="GAMING">
@@ -120,7 +120,7 @@
 
 
                                 </div>
-                                <div class="col-12">
+                                <div class="col-12" id="priceFilter">
                                     <div class="mb-2"><b>Mức giá</b></div>
 
                                     <div class="form-check form-check-inline">
@@ -145,7 +145,7 @@
 
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="checkbox" id="price-5"
-                                            value="tren-20-triệu">
+                                            value="tren-20-trieu">
                                         <label class="form-check-label" for="price-5">Trên 20 triệu</label>
                                     </div>
                                 </div>
@@ -165,21 +165,21 @@
                                     </div>
 
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" id="sort-3" value="gia-nothing"
-                                            name="radio-sort">
+                                        <input class="form-check-input" type="radio" id="sort-3"
+                                            value="gia-khong-sap-xep" name="radio-sort" checked>
                                         <label class="form-check-label" for="sort-3">Không sắp xếp</label>
                                     </div>
 
                                 </div>
                                 <div class="col-12">
-                                    <button
+                                    <button id="btnFilter"
                                         class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4">
                                         Lọc Sản Phẩm
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-md-8 text-center"> <!--Phần sản phẩm rộng 8 column bên phải -->
+                        <div class="col-12 col-md-8 text-center">
                             <div class="row g-4">
                                 <% products.forEach( function (product) { %>
                                     <div class="col-md-6 col-lg-4">
@@ -217,30 +217,35 @@
                                         </div>
                                     </div>
                                     <% }) %>
-
-                                        <div class="pagination d-flex justify-content-center mt-5">
-                                            <li class="<%= page === 1 ? 'disabled page-item' : 'page-item' %> ">
-                                                <a class="page-link" href="/products?page=<%= page - 1  %>"
-                                                    aria-label="Previous">
-                                                    <span aria-hidden="true">&laquo;</span>
-                                                </a>
-                                            </li>
-                                            <% for(var i=1; i <=totalPages; i++) {%>
-                                                <li class="page-item">
-                                                    <a class="<%= page === i ? 'active page-link' : 'page-link' %>"
-                                                        href="/products?page=<%= i  %>">
-                                                        <%= i %>
+                                        <% if(products?.length) { %>
+                                            <div class="pagination d-flex justify-content-center mt-5">
+                                                <li class="<%= page === 1 ? 'disabled page-item' : 'page-item' %> ">
+                                                    <a class="page-link" href="/products?page=<%= page - 1  %>"
+                                                        aria-label="Previous">
+                                                        <span aria-hidden="true">&laquo;</span>
                                                     </a>
                                                 </li>
-                                                <% } %>
-                                                    <li
-                                                        class="<%= page === totalPages ? 'disabled page-item' : 'page-item' %> ">
-                                                        <a class="page-link" href="/products?page=<%= page + 1  %>"
-                                                            aria-label="Next">
-                                                            <span aria-hidden="true">&raquo;</span>
+                                                <% for(var i=1; i <=totalPages; i++) {%>
+                                                    <li class="page-item">
+                                                        <a class="<%= page === i ? 'active page-link' : 'page-link' %>"
+                                                            href="/products?page=<%= i  %>">
+                                                            <%= i %>
                                                         </a>
                                                     </li>
-                                        </div>
+                                                    <% } %>
+                                                        <li
+                                                            class="<%= page === totalPages ? 'disabled page-item' : 'page-item' %> ">
+                                                            <a class="page-link" href="/products?page=<%= page + 1  %>"
+                                                                aria-label="Next">
+                                                                <span aria-hidden="true">&raquo;</span>
+                                                            </a>
+                                                        </li>
+                                            </div>
+                                            <% } else { %>
+                                                <div>Sản phẩm không tồn tại hoặc đã bán hết.
+                                                </div>
+                                                <% } %>
+
                             </div>
                         </div>
                     </div>

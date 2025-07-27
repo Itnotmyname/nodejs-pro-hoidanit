@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { countTotalProductClientPages, getProducts } from "services/client/item.service";
 import { handleCreateUser, getAllUsers, handleDeleteUser, getUserById, updateUserById, getAllRoles } from "services/user.service";
+import { getProductWithFilter, userFilter, yeuCau1, yeuCau2, yeuCau3, yeuCau4, yeuCau5, yeuCau6, yeuCau7 } from "./client/product.filter";
 
 const getHomePage = async (req: Request, res: Response) => {
     const { page } = req.query;//Xem bài 136 phút 3:50 để hiểu và 141 phút 3:27
@@ -21,21 +22,64 @@ const getHomePage = async (req: Request, res: Response) => {
 }
 
 const getProductFilterPage = async (req: Request, res: Response) => {
-    const { page } = req.query;
+    const { page, factory = "", target = "", price = "", sort = "" } = req.query as { //Việc dấu = "" là kiến thức của javascript ,đây là truyền giá trị mặc định cho factory, target, price và sort nếu chúng không được truyền vào query (tức là "rỗng")
+        page?: string,
+        factory: string,
+        target: string,
+        price: string,
+        sort: string
+    };
 
     let currentPage = page ? +page : 1; //Nếu có page thì convert sang number, nếu không thì mặc định là 1
     if (currentPage <= 0) {
         currentPage = 1; //Nếu page nhỏ hơn hoặc bằng 0 thì mặc định là 1 ,điều này giúp không thể lấy page âm hoặc page 0
     }
+    // const totalPages = await countTotalProductClientPages(6); //Xem bài 141 phút 05:00 để hiểu
+    // const products = await getProducts(currentPage, 6);
 
-    const products = await getProducts(currentPage, 6);
-    const totalPages = await countTotalProductClientPages(6); //Xem bài 141 phút 05:00 để hiểu
+    const datane = await getProductWithFilter(currentPage, 6, factory, target, price, sort);
+
     return res.render("client/product/filter.ejs", {
-        products: products,
-        totalPages: +totalPages, //Truyền vào view để hiển thị số trang
+        products: datane.products,
+        totalPages: +datane.totalPages, //Truyền vào view để hiển thị số trang
         page: +currentPage, //Truyền vào view để hiển thị số trang
     });
 }
+
+// const { username } = req.query;
+// const users = await userFilter(username as string);
+
+// const { minPrice, maxPrice, factory, price, sort } = req.query;
+
+// //Yêu cầu 1
+// const products1 = await yeuCau1(+minPrice);
+
+// // //Yêu cầu 2
+// const products2 = await yeuCau2(+maxPrice);
+
+// // //Yêu cầu 3
+// const products3 = await yeuCau3(factory as string);
+
+// // //Yêu cầu 4
+// const products4 = await yeuCau4((factory as string).split(","));
+
+// // //Yêu cầu 5
+// const products5 = await yeuCau5(10000000, 15000000);
+
+// // //Yêu cầu 6
+// const products6 = await yeuCau6();
+
+// // //Yêu cầu 7
+// const products7 = await yeuCau7();
+
+//Yêu cầu 8
+// const products8 = await yeuCau8();
+
+// res.status(200).json({
+//     data: products1
+// });
+    
+
 
 const getCreateUserPage = async (req: Request, res: Response) => {
     const roles = await getAllRoles();//Lấy tất cả các role từ database

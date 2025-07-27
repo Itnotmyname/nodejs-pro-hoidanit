@@ -43,15 +43,17 @@ const getAllUsers = async (page: number) => {
         skip: skip, //Bỏ qua số lượng bản ghi đã tính toán .Đây chính là Offset trong SQL
         take: pageSize, //Lấy số lượng bản ghi theo kích thước trang .Đây chính là Limit trong SQL
     });
+    console.log(getAllUsers);
     return users;
 
 }
 
 const countTotalUserPages = async () => { //Xem bài 139 phút 3
     const pageSize = TOTAL_ITEMS_PER_PAGE; //Số lượng user hiển thị trên mỗi trang ,xem bài 139 phút 02:30
-    const totalItems = await prisma.user.count(); //Lấy tổng số bản ghi trong bảng user
+    const totalItems = await prisma.user.count(); //Đếm tổng số bản ghi trong bảng user
 
     const totalPages = Math.ceil(totalItems / pageSize); //Tính toán tổng số trang dựa trên tổng số bản ghi và kích thước trang và hàm Math.ceil để làm tròn lên
+    console.log(totalPages); //In ra tổng số trang để kiểm tra
     return totalPages;
 }
 

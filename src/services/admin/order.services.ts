@@ -9,6 +9,7 @@ const getOrderAdmin = async (page: number) => { //Xem bài 128
         take: pageSize, //Lấy số lượng bản ghi theo kích thước trang .Đây chính là Limit trong SQL
         include: { user: true } //Lấy thêm người dùng ở đây mục đích để hiển thị người dùng 
     });
+    console.log(getOrderAdmin);
     return orders;
 
 }
@@ -18,6 +19,7 @@ const countTotalOrderPages = async () => {
     const totalItems = await prisma.order.count(); //Lấy tổng số bản ghi trong bảng product
 
     const totalPages = Math.ceil(totalItems / pageSize); //Tính toán tổng số trang dựa trên tổng số bản ghi và kích thước trang và hàm Math.ceil để làm tròn lên
+    console.log(totalPages);
     return totalPages;
 }
 
