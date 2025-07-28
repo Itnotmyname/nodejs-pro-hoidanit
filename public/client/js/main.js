@@ -1,3 +1,6 @@
+const { error } = require("console");
+const { success } = require("zod/v4");
+
 (function ($) {
     "use strict";
 
@@ -318,6 +321,98 @@
     if (params.has('sort')) {
         const sort = params.get('sort');
         $(`input[type="radio"][name="radio-sort"][value="${sort}"]`).prop('checked', true);
+    }
+
+    //handle add to cart with ajax
+    $('.btnAddToCartHomepage').click(function (event) {
+        event.preventDefault();//Dòng lệnh của việc ngăn hành động mặc định cụ thể là ngăn action của dòng 115 file show.ejs của phần home 
+        
+        if (!isLogin()) {
+            $.toast({
+                heading: 'Lỗi thao tác',
+                text: 'Bạn cần đăng nhập tài khoản',
+                position: 'top-right',
+                icon: 'error'
+            })
+            return;
+        }
+
+        const productId = $(this).attr('data-product-id'); //Toán tử this ám chỉ cái element mà ta đang thao tác cụ thể là cái button từ dòng 117-122 trong file show.ejs của phần home
+
+        $.ajax({
+            url: `${window.location, origin}/api/add-product-to-cart`, //Truyền vào URL ,và URL chính là const router định nghĩa bên api.ts dòng 8 và dòng 10
+            type: "POST",//method
+            data: JSON.stringify({ quantity: 1, productId: productId }),//Truyền data :quantity =1 vì trang chủ của chúng ta tăng 1 sản phẩm 1 lần ,truyền productId 
+            contentType: "application/json", //Quy định dạng datatype truyền dưới dạng json
+
+            success: function (response) { //nếu gọi data thành công thì sẽ chạy vào function success
+                const sum = +response.data; //data tại đây được lấy từ data:newSum nằm trong res.status(200).json của file api.controller.ts
+                //update cart (dùng jquery để cập nhật kết quả .Có dấu $)
+                $("#sumCart").text(sum) //Sau khi đã có const sum thì cập nhật giỏ hàng ,và $("#sumCart") này có id=sumCart tại file header.ejs của view/client/layout tại dòng 48
+                //show message
+                $.toast({  //Sau đó là hiển thị thông báo
+                    heading: 'Giỏ hàng',
+                    text: 'Thêm sản phẩm vào giỏ hàng thành công',
+                    position: 'top-right',
+                })
+
+            },
+            error: function (response) { //Nếu có lỗi thì báo lỗi (tức là nếu không chạy vào function success ý)
+                alert("Có lỗi xảy ra,vui lòng check lại code. ")
+                console.log("error: ", response);
+            }
+        })
+
+    });
+
+    $('.btnAddToCartDetail').click(function (event) {
+        event.preventDefault();//Dòng lệnh của việc ngăn hành động mặc định cụ thể là ngăn action của dòng 111 file detail.ejs từ views/client/product 
+        if (!isLogin()) {
+            $.toast({
+                heading: 'Lỗi thao tác',
+                text: 'Bạn cần đăng nhập tài khoản',
+                position: 'top-right',
+                icon: 'error'
+            })
+            return;
+        }
+
+        const productId = $(this).attr('data-product-id'); //Toán tử this ám chỉ cái element mà ta đang thao tác cụ thể là cái button từ dòng 117-122 trong file show.ejs của phần home
+
+        const quantity = $("#quantityDetail").val(); //Vì quantity ở chi tiết sản phẩm là ta có thể thay đổi ngay trên web nên tâ lấy động theo input tại dòng 112 file detail.ejs từ views/client/product ,cụ thể là lấy theo cái id="quantityDetail" ngay tại dòng đó
+
+        $.ajax({
+            url: `${window.location, origin}/api/add-product-to-cart`, //Truyền vào URL ,và URL chính là const router định nghĩa bên api.ts dòng 8 và dòng 10
+            type: "POST",//method
+            data: JSON.stringify({ quantity: quantity, productId: productId }),//Truyền data :quantity =quantity vì tại chi tiết sản phẩm có thể chỉnh sửa chọn thêm bao nhiêu sản phẩm vào giỏ hàng ,truyền productId 
+            contentType: "application/json", //Quy định dạng datatype truyền dưới dạng json
+
+            success: function (response) { //nếu gọi data thành công thì sẽ chạy vào function success
+                const sum = +response.data; //data tại đây được lấy từ data:newSum nằm trong res.status(200).json của file api.controller.ts
+                //update cart (dùng jquery để cập nhật kết quả .Có dấu $)
+                $("#sumCart").text(sum) //Sau khi đã có const sum thì cập nhật giỏ hàng ,và $("#sumCart") này có id=sumCart tại file header.ejs của view/client/layout tại dòng 48
+                //show message
+                $.toast({  //Sau đó là hiển thị thông báo
+                    heading: 'Giỏ hàng',
+                    text: 'Thêm sản phẩm vào giỏ hàng thành công',
+                    position: 'top-right',
+                })
+
+            },
+            error: function (response) { //Nếu có lỗi thì báo lỗi (tức là nếu không chạy vào function success ý)
+                alert("Có lỗi xảy ra,vui lòng check lại code. ")
+                console.log("error: ", response);
+            }
+        })
+    });
+
+    function isLogin() {
+        const navElement = $("#navbarCollapse");//Lấy theo element là navbarCollapse tại dòng 37 của file header.ejs của view/client/layout ,nếu đăng nhập thành công tức là chạy lệnh từ dòng đó đến dòng 83 còn nếu chưa đăng nhập thì chạy nốt cái else ngay dưới
+        const childLogin = navElement.find('a.a-login'); //navElement.find có nghĩa là tìm kiếm (quét) tất cả thuộc tính (element) có thẻ a có class là a-login 
+        if (childLogin.length > 0) { //Nếu childLogin.length lớn hơn 1 ,có nghĩa là const childLogin tìm được thẻ a có class là a-login thì return false
+            return false;
+        }
+        return true;//Còn không thì return true
     }
 
 })(jQuery); //Nhận dạng jQuery thông qua dấu $ 

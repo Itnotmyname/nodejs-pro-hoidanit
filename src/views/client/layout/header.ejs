@@ -44,7 +44,7 @@
                         <i class="fa fa-shopping-bag fa-2x"></i>
                         <span
                             class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
-                            style="top: -5px; left: 15px; height: 20px; min-width: 20px;">
+                            style="top: -5px; left: 15px; height: 20px; min-width: 20px;" id="sumCart">
                             <%= user?.sumCart ?? 0 %>
                                 <!-- Xem bài 121 phút 14:30 -->
                         </span>
@@ -81,9 +81,9 @@
                             </ul>
                         </div>
                         <% } else{ %>
-                            <a href="/login">
+                            <a href="/login" class="a-login">
                                 <!-- Nếu xem được video 113 sẽ thấy rằng phần này là do chính bản thân mình tự sửa theo ý muốn của mình ở dòng ngay dưới lồng trong thẻ <a></a> -->
-                                <i class="fas fa-user fa-2x"></i></>
+                                <i class="fas fa-user fa-2x"></i>
                             </a>
                             <% } %>
                 </div>
