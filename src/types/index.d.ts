@@ -6,7 +6,7 @@ import { Role, User as UserPrisma } from '@prisma/client'
 declare global {
     namespace Express {
         interface User extends UserPrisma { //Xem bài 119 phút 9:20
-            role?: Role  //Dấu ? ở sau có nghĩa là Optional có hay ko cũng ok
+            role?: Role;  //Dấu ? ở sau có nghĩa là Optional có hay ko cũng ok
             sumCart?: number;//Để được gợi ý code (bài 121 phút 16)
         }
     }
