@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { countTotalProductClientPages, getProducts } from "services/client/item.service";
 import { handleCreateUser, getAllUsers, handleDeleteUser, getUserById, updateUserById, getAllRoles } from "services/user.service";
-import { getProductWithFilter, userFilter, yeuCau1, yeuCau2, yeuCau3, yeuCau4, yeuCau5, yeuCau6, yeuCau7 } from "./client/product.filter";
+import { getProductWithFilter, userFilter, yeuCau1, yeuCau2, yeuCau3, yeuCau4, yeuCau5, yeuCau6, yeuCau7 } from "../services/client/product.filter";
 
 const getHomePage = async (req: Request, res: Response) => {
     const { page } = req.query;//Xem bài 136 phút 3:50 để hiểu và 141 phút 3:27
