@@ -1,7 +1,8 @@
-import { createUserAPI, deleteUserByIdAPI, getAllUsersAPI, getUserByIdAPI, postAddProductToCartAPI, updateUserByIdAPI } from 'controllers/client/api.controller';
+import { createUserAPI, deleteUserByIdAPI, fetchAccountAPI, getAllUsersAPI, getUserByIdAPI, loginAPI, postAddProductToCartAPI, updateUserByIdAPI } from 'controllers/client/api.controller';
 import express, { Express } from 'express';
 
 import { getAllUsers } from 'services/user.service';
+import { checkValidJWT } from 'src/middleware/jwt.middleware';
 
 const router = express.Router();
 
@@ -12,12 +13,14 @@ const apiRoutes = (app: Express) => {
     router.get("/users", getAllUsersAPI);
     router.get("/users/:id", getUserByIdAPI);
     router.post("/users", createUserAPI);
+    router.put("/users/:id", updateUserByIdAPI);
+    router.delete("/users/:id", deleteUserByIdAPI);
 
-    router.patch("/users/:id", updateUserByIdAPI);
+    router.post("/login", loginAPI);
 
-    router.delete("/users/:id", deleteUserByIdAPI)
+    router.get("/account", fetchAccountAPI);
 
-    app.use("/api", router);
+    app.use("/api", checkValidJWT, router);
 }
 
 export default apiRoutes;

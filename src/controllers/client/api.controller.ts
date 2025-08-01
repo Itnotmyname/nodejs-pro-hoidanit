@@ -1,6 +1,6 @@
 
 import { Request, Response } from "express";
-import { handleDeleteUserById, handleGetAllUser, handleGetUserById, handleUpdateUserById } from "services/client/api.service";
+import { handleDeleteUserById, handleGetAllUser, handleGetUserById, handleUpdateUserById, handleUserLogin } from "services/client/api.service";
 import { registerNewUser } from "services/client/auth.service";
 import { addProductToCart } from "services/client/item.service";
 import { RegisterSchema, TRegisterSchema } from "src/validation/register.schema";
@@ -24,6 +24,8 @@ const postAddProductToCartAPI = async (req: Request, res: Response) => {
 const getAllUsersAPI = async (req: Request, res: Response) => {
 
     const users = await handleGetAllUser();
+    const user = req.user;
+    console.log("check user:", user);
     res.status(200).json({
         data: users
     })
@@ -64,7 +66,7 @@ const updateUserByIdAPI = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     //success
-    await handleUpdateUserById(+id,fullName, address, phone);
+    await handleUpdateUserById(+id, fullName, address, phone);
 
     res.status(200).json({
         data: "Update user succeed"
@@ -82,4 +84,33 @@ const deleteUserByIdAPI = async (req: Request, res: Response) => {
     })
 }
 
-export { postAddProductToCartAPI, getAllUsersAPI, getUserByIdAPI, createUserAPI, updateUserByIdAPI, deleteUserByIdAPI }
+const loginAPI = async (req: Request, res: Response) => {
+    const { username, password } = req.body;
+    try {
+        const access_token = await handleUserLogin(username, password);
+        res.status(200).json({
+            data: {
+                access_token
+            }
+        })
+    } catch (error) {
+        res.status(401).json({
+            data: null,
+            message: error.message
+        })
+    }
+
+
+}
+
+const fetchAccountAPI = async (req: Request, res: Response) => { //Xem từ 11 phút 58 bài 
+    const user = req.user; //Cái req.user này ở middleware mà chạy qua middleware trước   
+        res.status(200).json({
+            data: {
+                user:user,
+            }
+        })
+    }
+
+
+export { postAddProductToCartAPI, getAllUsersAPI, getUserByIdAPI, createUserAPI, updateUserByIdAPI, deleteUserByIdAPI, loginAPI, fetchAccountAPI }
